@@ -5,6 +5,10 @@ FROM rust
 # opencv 依赖
 # RUN apt install libopencv-dev clang libclang-dev
 
+RUN pwd
+
+RUN ls
+
 # build rust
 RUN cargo build --release
 
