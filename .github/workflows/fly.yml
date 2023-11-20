@@ -1,0 +1,26 @@
+name: OCR Rust
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    steps:
+      - name : Init Rust Env
+      - uses: docker://rust:1.67
+
+      - name : Build My Axum App
+      - run: cargo build --release
+
+      - name : kankan pwd
+      - run: pwd
+  tesseract:
+    steps:
+      - name: Init Tesseract
+      - uses: docker://jitesoft/tesseract-ocr
+
+  axum:
+    run : ./target/release/ocr-rust
+
+

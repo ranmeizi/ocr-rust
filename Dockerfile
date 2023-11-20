@@ -12,7 +12,7 @@ RUN cargo build --release
 
 # 安装 ocr 环境
 
-FROM jitesoft/tesseract-ocr:5.3.3
+FROM jitesoft/tesseract-ocr
 
 # 启动 rust 服务
 
