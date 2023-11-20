@@ -2,8 +2,6 @@
 
 FROM rust
 
-WORKDIR /app
-
 # opencv 依赖
 # RUN apt install libopencv-dev clang libclang-dev
 
@@ -16,4 +14,4 @@ RUN cargo build --release
 
 # 启动 rust 服务
 
-RUN /app/target/release/ocr-rust
+RUN ./target/release/ocr-rust
