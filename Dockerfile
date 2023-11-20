@@ -5,16 +5,14 @@ FROM rust
 WORKDIR /app
 
 # opencv 依赖
-RUN apt install libopencv-dev clang libclang-dev
+# RUN apt install libopencv-dev clang libclang-dev
 
 # build rust
 RUN cargo build --release
 
 # 安装 ocr 环境
 
-FROM jitesoft/tesseract-ocr
-
-RUN docker --version
+# FROM jitesoft/tesseract-ocr
 
 # 启动 rust 服务
 
