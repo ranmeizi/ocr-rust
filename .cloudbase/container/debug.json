@@ -3,8 +3,7 @@
     {
       "name": "ocr-rust",
       "domain": "",
-      "ip": "",
-      "containerId": "5813aeec20efe65ba4e23c2dd19ee6976499fcad2f4afe342eaaf3b88c68005a"
+      "ip": ""
     }
   ],
   "config": {
@@ -20,7 +19,7 @@
       "policyThreshold": 60,
       "envParams": {},
       "customLogs": "stdout",
-      "containerPort": 80,
+      "containerPort": 3000,
       "initialDelaySeconds": 2
     }
   }
