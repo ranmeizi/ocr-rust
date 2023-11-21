@@ -19,7 +19,7 @@
       "policyThreshold": 60,
       "envParams": {},
       "customLogs": "stdout",
-      "containerPort": 3000,
+      "containerPort": 80,
       "initialDelaySeconds": 2
     }
   }
