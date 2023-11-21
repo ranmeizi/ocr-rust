@@ -2,7 +2,7 @@ FROM rust
 
 WORKDIR /app
 
-COPY cargo.toml /app
+COPY Cargo.toml /app
 
 COPY . /app
 
