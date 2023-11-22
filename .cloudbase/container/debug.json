@@ -3,7 +3,8 @@
     {
       "name": "ocr-rust",
       "domain": "",
-      "ip": ""
+      "ip": "",
+      "containerId": "6e684dea8308b85ddd8e28af751d86e9d9532813ea203d37dcffe4726f0b252a"
     }
   ],
   "config": {
