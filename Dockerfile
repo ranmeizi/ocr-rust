@@ -8,9 +8,9 @@ WORKDIR /app
 
 RUN mkdir -p /root/.cargo 
 RUN echo '[source.crates-io]\n\
-replace-with = "ustc"\n\
-[source.ustc]\n\
-registry = "https://mirrors.ustc.edu.cn/crates.io-index"' > /root/.cargo/config
+replace-with = "tuna"\n\
+[source.tuna]\n\
+registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"' > /root/.cargo/config
 
 RUN cargo build --release
 
