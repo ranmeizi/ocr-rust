@@ -5,7 +5,8 @@ pub async fn ocr_handler() -> impl IntoResponse {
     // "hello"
     // 调用
     let output = Command::new("tesseract")
-        .arg("/tmp/hrl1.jpg stdout")
+        .arg("/tmp/hrl1.jpg")
+        .arg("stdout")
         .output()
         .expect("error");
     // let std_out = tesseract_child.stdout.expect("Failed to open echo stdout");
