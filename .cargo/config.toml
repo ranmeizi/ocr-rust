@@ -11,8 +11,6 @@ replace-with = 'tuna' # 如：tuna、sjtu、ustc，或者 rustcc
 # 中国科学技术大学
 [source.ustc]
 registry = "https://mirrors.ustc.edu.cn/crates.io-index"
-# >>> 或者 <<<
-registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 
 # 上海交通大学
 [source.sjtu]
