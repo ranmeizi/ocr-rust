@@ -12,6 +12,6 @@ WORKDIR /app
 # [source.tuna]\n\
 # registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"' > /root/.cargo/config
 
-RUN cargo build --release
+# RUN cargo build --release
 
-CMD /app/target/release/ocr-rust
+CMD /app/pre-build/ocr-rust
