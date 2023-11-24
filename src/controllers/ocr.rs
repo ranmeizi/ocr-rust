@@ -1,4 +1,10 @@
-use axum::response::IntoResponse;
+use axum::{body::Bytes, extract::Multipart, response::IntoResponse};
+use opencv::{
+    core::{in_range, Mat, Scalar, Vector},
+    imgcodecs::{self, imwrite},
+    prelude::*,
+};
+use std::io::Cursor;
 use std::process::{Command, Stdio};
 
 pub async fn ocr_handler() -> impl IntoResponse {
@@ -11,7 +17,7 @@ pub async fn ocr_handler() -> impl IntoResponse {
         .expect("error");
     // let std_out = tesseract_child.stdout.expect("Failed to open echo stdout");
 
-    let outstr:String = String::from_utf8(output.stdout).unwrap();
+    let outstr: String = String::from_utf8(output.stdout).unwrap();
 
     outstr
 }
@@ -20,8 +26,45 @@ pub async fn ocr_handler() -> impl IntoResponse {
  * 纯净的ocr
  * 完全不处理文字直接返回
  */
-pub async fn ocr_pure() -> impl IntoResponse {
-    "hello"
+pub async fn ocr_pure(mut multipart: Multipart) -> impl IntoResponse {
+    let mut params: OcrParams = OcrParams {
+        r#type: None,
+        img: None,
+    };
+    while let Some(mut field) = multipart.next_field().await.unwrap() {
+        let name = field.name().unwrap().to_string();
+        let data = field.bytes().await.unwrap();
+
+        if name == "type" {
+            params.r#type = Some(String::from_utf8(data.to_vec()).unwrap());
+        }
+
+        if name == "img" {
+            params.img = Some(data);
+        }
+    }
+
+    let image_data = params.img.unwrap();
+
+    let data: Vector<u8> = Vector::from_iter(image_data);
+
+    let mat = imgcodecs::imdecode(&data, imgcodecs::IMREAD_COLOR).unwrap();
+
+    // 二值化
+    let mut dst = Mat::default();
+
+    in_range(
+        &mat,
+        &Scalar::new(77.0, 77.0, 77.0, 77.0),
+        &Scalar::new(255.0, 255.0, 255.0, 255.0),
+        &mut dst,
+    );
+
+    // 保存阈值化后的图片
+    imwrite("threshold1.jpg", &dst, &Vector::new()).unwrap();
+
+    // println!("{:?}", params);
+    "1"
 }
 
 /**
@@ -38,4 +81,10 @@ pub async fn ocr_pet_field_guide() -> impl IntoResponse {
  */
 pub async fn ocr_stats_panel() -> impl IntoResponse {
     "hello"
+}
+
+#[derive(Debug)]
+struct OcrParams {
+    r#type: Option<String>,
+    img: Option<Bytes>,
 }

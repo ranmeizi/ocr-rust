@@ -1,6 +1,7 @@
 // use opencv::prelude::Mat;
 use opencv::imgcodecs::imread;
 
+
 pub struct OCR {}
 
 impl OCR {
@@ -22,7 +23,11 @@ impl OCR {
 
 #[cfg(test)]
 mod tests {
-    use opencv::imgcodecs::imread;
+    use opencv::{
+        core,
+        imgcodecs::{imread, imwrite},
+        imgproc,
+    };
 
     #[test]
     fn test_binarization() {
@@ -30,7 +35,17 @@ mod tests {
         let img = imread("ocr-test/hrl.jpg", 1).unwrap();
 
         // 二值化
+        let mut dst = core::Mat::default();
+
+        core::in_range(&img, &core::Scalar::new(77.0, 77.0, 77.0, 77.0), &core::Scalar::new(255.0, 255.0, 255.0, 255.0), &mut dst);
+
+        // 保存阈值化后的图片
+        imwrite("threshold.jpg", &dst, &core::Vector::new()).unwrap();
 
         println!("{:?}", img);
+    }
+
+    fn test_binarization_from_binary(){
+        
     }
 }

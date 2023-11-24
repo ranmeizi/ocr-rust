@@ -1,0 +1,12 @@
+{
+  "name": "ocr-rust",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ranmeizi/ocr-rust.git",
+  "author": "boboan <360969885@qq.com>",
+  "license": "MIT",
+  "scripts": {
+    "build:app": "sh build/build.sh",
+    "build:env": "docker build -t boboan/ocr-rust-env -f env.Dockerfile ."
+  }
+}
