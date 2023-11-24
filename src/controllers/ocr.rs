@@ -6,6 +6,7 @@ use opencv::{
 };
 use std::io::Cursor;
 use std::process::{Command, Stdio};
+use crate::services::ocr::OCR;
 
 pub async fn ocr_handler() -> impl IntoResponse {
     // "hello"
@@ -44,27 +45,15 @@ pub async fn ocr_pure(mut multipart: Multipart) -> impl IntoResponse {
         }
     }
 
-    let image_data = params.img.unwrap();
+    let mat = OCR::binarization(params.img.unwrap());
+    let mut result = OCR::ocr(mat).await;
+    
 
-    let data: Vector<u8> = Vector::from_iter(image_data);
-
-    let mat = imgcodecs::imdecode(&data, imgcodecs::IMREAD_COLOR).unwrap();
-
-    // 二值化
-    let mut dst = Mat::default();
-
-    in_range(
-        &mat,
-        &Scalar::new(77.0, 77.0, 77.0, 77.0),
-        &Scalar::new(255.0, 255.0, 255.0, 255.0),
-        &mut dst,
-    );
-
-    // 保存阈值化后的图片
-    imwrite("threshold1.jpg", &dst, &Vector::new()).unwrap();
-
-    // println!("{:?}", params);
-    "1"
+    if let Ok(str) = result{
+        str
+    }else {
+        "".to_owned()
+    }
 }
 
 /**

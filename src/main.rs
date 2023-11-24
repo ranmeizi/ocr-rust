@@ -4,6 +4,7 @@ use tokio;
 mod routes;
 mod controllers;
 mod services;
+mod util;
 
 #[tokio::main]
 async fn main() {
