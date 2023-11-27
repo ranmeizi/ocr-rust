@@ -129,7 +129,7 @@ struct BatchDownloadFileRes {
 
 #[derive(Debug, Deserialize)]
 struct FileList {
-    field: String,
+    fileid: String,
     download_url: String,
     status: i32,
     errmsg: String,
