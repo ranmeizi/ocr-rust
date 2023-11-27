@@ -78,9 +78,10 @@ impl OCR {
     }
 
     pub async fn get_img_from_cloud(fileid: String) -> anyhow::Result<String> {
+        println!("get_img_from_cloud, {}", fileid);
         let client = Client::new();
         let res = client
-            .post("https://api.weixin.qq.com/tcb/batchdownloadfile")
+            .post("http://api.weixin.qq.com/tcb/batchdownloadfile")
             .body(
                 json!({
                     "env":"prod-7g2acur2ee3f2b4e",
@@ -103,6 +104,7 @@ impl OCR {
     }
 
     pub async fn download_url(url: String) -> anyhow::Result<Bytes> {
+        println!("download_url,{}", url);
         let response = reqwest::get(url).await?;
 
         // 创建一个文件来保存图片
@@ -174,6 +176,6 @@ mod tests {
                 "max_age":60*5
             }]
         });
-        println!("{}", abc)
+        println!("{}", abc.to_string())
     }
 }
