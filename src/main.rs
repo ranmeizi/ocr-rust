@@ -5,6 +5,8 @@ mod routes;
 mod controllers;
 mod services;
 mod util;
+mod res;
+mod error;
 
 #[tokio::main]
 async fn main() {

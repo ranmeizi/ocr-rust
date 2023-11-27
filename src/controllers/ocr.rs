@@ -1,12 +1,20 @@
-use axum::{body::Bytes, extract::Multipart, response::IntoResponse};
+use crate::services::ocr::OCR;
+use axum::{
+    body::Bytes,
+    extract::{Json, Multipart, Query},
+    response::IntoResponse,
+};
+use axum_extra::extract::WithRejection;
+use base64_url;
 use opencv::{
     core::{in_range, Mat, Scalar, Vector},
     imgcodecs::{self, imwrite},
     prelude::*,
 };
+use serde::{Deserialize, Serialize};
 use std::io::Cursor;
 use std::process::{Command, Stdio};
-use crate::services::ocr::OCR;
+use crate::res::Res;
 
 pub async fn ocr_handler() -> impl IntoResponse {
     // "hello"
@@ -47,11 +55,28 @@ pub async fn ocr_pure(mut multipart: Multipart) -> impl IntoResponse {
 
     let mat = OCR::binarization(params.img.unwrap());
     let mut result = OCR::ocr(mat).await;
-    
 
-    if let Ok(str) = result{
+    if let Ok(str) = result {
         str
-    }else {
+    } else {
+        "".to_owned()
+    }
+}
+
+pub async fn ocr_base64(
+    WithRejection(Json(param), _): WithRejection<Json<Base64Params>, Res<()>>,
+) -> impl IntoResponse {
+    let r#type = param.r#type.unwrap();
+    let img = param.img.unwrap();
+
+    let data = base64_url::base64::decode(img);
+
+    let mat = OCR::binarization_vec(data.unwrap());
+    let mut result = OCR::ocr(mat).await;
+
+    if let Ok(str) = result {
+        str
+    } else {
         "".to_owned()
     }
 }
@@ -76,4 +101,10 @@ pub async fn ocr_stats_panel() -> impl IntoResponse {
 struct OcrParams {
     r#type: Option<String>,
     img: Option<Bytes>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Base64Params {
+    r#type: Option<String>,
+    img: Option<String>,
 }

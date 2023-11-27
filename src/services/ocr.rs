@@ -30,6 +30,27 @@ impl OCR {
         dst
     }
 
+     /** 二值化 */
+     pub fn binarization_vec(vec: Vec<u8>) -> Mat {
+        // 读取图片 mat
+        let data: Vector<u8> = Vector::from_iter(vec);
+
+        let mat = imgcodecs::imdecode(&data, imgcodecs::IMREAD_COLOR).unwrap();
+
+        // 二值化
+        let mut dst = Mat::default();
+
+        in_range(
+            &mat,
+            &Scalar::new(77.0, 77.0, 77.0, 77.0),
+            &Scalar::new(255.0, 255.0, 255.0, 255.0),
+            &mut dst,
+        );
+
+        dst
+    }
+
+
     /** 拿着二值的图片调用ocr */
     pub async fn ocr(dst: Mat) -> Result<String,Box<dyn std::error::Error>> {
         let filename = random_str(20) + ".jpg";
