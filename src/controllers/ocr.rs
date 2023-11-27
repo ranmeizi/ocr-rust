@@ -84,8 +84,22 @@ pub async fn ocr_base64(
 pub async fn ocr_cloud_oss(
     WithRejection(Json(param), _): WithRejection<Json<CloudFileParams>, Res<()>>,
 ) -> impl IntoResponse {
-    let url = OCR::get_img_from_cloud(param.fileid).await.unwrap();
-    let bytes = OCR::download_url(url).await.unwrap();
+    let url_res = OCR::get_img_from_cloud(param.fileid).await;
+
+    if let Err(x) = &url_res {
+        println!("get_img_from_cloud, err msg{:?}", x);
+    }
+
+    let url = url_res.unwrap();
+
+    let bytes_res = OCR::download_url(url).await;
+
+    if let Err(x) = &bytes_res {
+        println!("download_url, err msg{:?}", x);
+    }
+
+    let bytes = bytes_res.unwrap();
+
     let mat = OCR::binarization(bytes);
 
     let mut result = OCR::ocr(mat).await;
