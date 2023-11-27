@@ -1,3 +1,4 @@
+use crate::res::Res;
 use crate::services::ocr::OCR;
 use axum::{
     body::Bytes,
@@ -14,7 +15,6 @@ use opencv::{
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
 use std::process::{Command, Stdio};
-use crate::res::Res;
 
 pub async fn ocr_handler() -> impl IntoResponse {
     // "hello"
@@ -81,6 +81,22 @@ pub async fn ocr_base64(
     }
 }
 
+pub async fn ocr_cloud_oss(
+    WithRejection(Json(param), _): WithRejection<Json<CloudFileParams>, Res<()>>,
+) -> impl IntoResponse {
+    let url = OCR::get_img_from_cloud(param.fileid).await.unwrap();
+    let bytes = OCR::download_url(url).await.unwrap();
+    let mat = OCR::binarization(bytes);
+
+    let mut result = OCR::ocr(mat).await;
+
+    if let Ok(str) = result {
+        str
+    } else {
+        "".to_owned()
+    }
+}
+
 /**
  * 宠物图鉴
  * 只关注成长值数据
@@ -107,4 +123,9 @@ struct OcrParams {
 pub struct Base64Params {
     r#type: Option<String>,
     img: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CloudFileParams {
+    fileid: String,
 }
