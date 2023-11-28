@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build:app": "sh build/build.sh",
-    "build:env": "docker build -t boboan/ocr-rust-env -f env.Dockerfile ."
+    "build:env": "docker build -t boboan/ocr-rust-env -f env.Dockerfile .",
+    "ocr":"docker run -v $PWD/threshold.jpg:/tmp/threshold.jpg -v $PWD/ocr-test/chi_sim.traineddata:/usr/local/share/tessdata/chi_sim.traineddata jitesoft/tesseract-ocr -l chi_sim /tmp/threshold.jpg stdout"
   }
 }
