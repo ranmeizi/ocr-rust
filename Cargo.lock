@@ -657,6 +657,7 @@ dependencies = [
  "cv_self",
  "opencv",
  "rand",
+ "regex",
  "reqwest",
  "serde",
  "serde_json",

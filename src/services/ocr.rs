@@ -1,5 +1,5 @@
 // use opencv::prelude::Mat;
-use crate::util::random_str::random_str;
+use crate::util::{props_extractor, random_str::random_str};
 use anyhow;
 use anyhow::Result;
 use axum::body::Bytes;

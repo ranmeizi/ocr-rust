@@ -49,6 +49,7 @@ const reducers = {
                 type: 'growth_sum_ex'
             }
         }
+        return state
     },
     // 名称状态，匹配下一个词,作为宠物名称
     name: (state, curr) => {
@@ -63,49 +64,81 @@ const reducers = {
         return {
             ...state,
             type: 'growth_hp',
-            name: curr,
+            growth_sum: curr,
         }
     },
     // 生命成长，匹配下一个 num 作为 攻击成长
     growth_hp: (state, curr) => {
-        
+
         return {
             ...state,
             type: 'growth_atk',
-            growth_atk: curr
+            growth_hp: curr
         }
     },
     // 攻击成长，匹配下一个 num 作为 防御成长
-    growth_atk: () => {
-        return 'growth_def'
+    growth_atk: (state, curr) => {
+        return {
+            ...state,
+            type: 'growth_def',
+            growth_atk: curr,
+        }
     },
     // 防御成长，匹配下一个 num 作为 敏捷成长
-    growth_def: () => {
-        return 'growth_agi'
+    growth_def: (state, curr) => {
+        return {
+            ...state,
+            type: 'growth_agi',
+            growth_def: curr
+        }
     },
     // 敏捷成长，转换为一般状态，继续匹配下一个词
-    growth_agi: () => {
-        return 'normal'
+    growth_agi: (state, curr) => {
+        return {
+            ...state,
+            type: 'normal',
+            growth_agi: curr
+        }
     },
     // 转生后总成长，匹配下一个 num 作为 转生后总成长
     growth_sum_ex: (state, curr) => {
-        return 'growth_hp_ex'
+        return {
+            ...state,
+            type: 'growth_hp_ex',
+            growth_sum_ex: curr
+        }
     },
     // 转生后生命成长，匹配下一个 num 作为 转生后攻击成长
-    growth_hp_ex: () => {
-        return 'growth_atk_ex'
+    growth_hp_ex: (state, curr) => {
+        return {
+            ...state,
+            type: 'growth_atk_ex',
+            growth_hp_ex: curr
+        }
     },
     // 转生后攻击成长，匹配下一个 num 作为 转生后防御成长
-    growth_atk_ex: () => {
-        return 'growth_def_ex'
+    growth_atk_ex: (state, curr) => {
+        return {
+            ...state,
+            type: 'growth_def_ex',
+            growth_atk_ex: curr
+        }
     },
     // 转生后防御成长，匹配下一个 num 作为 转生后敏捷成长
-    growth_def_ex: () => {
-        return 'growth_agi_ex'
+    growth_def_ex: (state, curr) => {
+        return {
+            ...state,
+            type: 'growth_agi_ex',
+            growth_def_ex: curr,
+        }
     },
     // 转生后敏捷成长，转换为一般状态，继续匹配下一个词
-    growth_agi_ex: () => {
-        return 'normal_ex'
+    growth_agi_ex: (state, curr) => {
+        return {
+            ...state,
+            type: 'normal',
+            growth_agi_ex: curr,
+        }
     }
 }
 
@@ -124,6 +157,9 @@ const data = {
     growth_agi_ex: null,
 }
 
-txt.reduce((state, curr) => {
+let res = txt.reduce((state, curr) => {
+    console.log(state)
+    return reducers[state.type](state, curr)
+}, data)
 
-})
+console.log('res',res)

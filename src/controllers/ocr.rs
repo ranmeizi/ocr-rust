@@ -1,5 +1,6 @@
 use crate::res::Res;
 use crate::services::ocr::OCR;
+use crate::util::props_extractor;
 use axum::{
     body::Bytes,
     extract::{Json, Multipart, Query},
@@ -13,6 +14,7 @@ use opencv::{
     prelude::*,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::io::Cursor;
 use std::process::{Command, Stdio};
 
@@ -57,7 +59,7 @@ pub async fn ocr_pure(mut multipart: Multipart) -> impl IntoResponse {
     let mut result = OCR::ocr(mat).await;
 
     if let Ok(str) = result {
-        str
+        json!(props_extractor::pet_info::pet_info(&str)).to_string()
     } else {
         "".to_owned()
     }
@@ -75,7 +77,7 @@ pub async fn ocr_base64(
     let mut result = OCR::ocr(mat).await;
 
     if let Ok(str) = result {
-        str
+        json!(props_extractor::pet_info::pet_info(&str)).to_string()
     } else {
         "".to_owned()
     }
@@ -106,7 +108,7 @@ pub async fn ocr_cloud_oss(
     let mut result = OCR::ocr(mat).await;
 
     if let Ok(str) = result {
-        str
+        json!(props_extractor::pet_info::pet_info(&str)).to_string()
     } else {
         "".to_owned()
     }
