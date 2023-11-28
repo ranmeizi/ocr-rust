@@ -245,9 +245,12 @@ fn capture_num(text: &str) -> Option<(String, String)> {
 pub fn pet_info(text: &str) -> PetInfoDto {
     let trim_re = Regex::new(r"\s").unwrap();
     // 转 vec
-    let vec = text.split("\u{21b5}").collect::<Vec<&str>>();
 
-    // 去掉换行
+    let newline_re = Regex::new(r"\u21b5|\n").unwrap();
+
+    let vec = newline_re.split(text).collect::<Vec<&str>>();
+
+    // 去掉空元素
     let iter = vec.iter().filter(|x| **x != "");
 
     // 去掉空格
@@ -294,9 +297,12 @@ mod tests {
 
     const TEXT: &str = "飞龙 系↵↵雷 龙 系↵↵成 长↵↵邦 奇 诺↵↵总 成 长↵↵生命 成 长↵攻击 成 长↵防御 成 长↵敏捷 成 长↵↵元 素↵↵转生 前↵↵(3.091~5.154)↵(0.94~1.568)↵(1.199~1.999)↵(0.25~0.417)↵(0.702~1.17)↵↵” 抽风 内 而 出 网 古风 同和↵↵| 属性↵↵转生 后↵↵(3.553~7.214)↵(1.081~2.195)↵(1.378~2.798)↵(0.287~0.583)↵(0.807~1.638)↵↵获取 途径↵";
 
+    const CASE2 :&str = "飞龙 系\n\n雷 龙 系\n\n成 长\n\n邦 奇 诺\n\n总 成 长\n\n生命 成 长\n攻击 成 长\n防御 成 长\n敏捷 成 长\n\n元 素\n\n转生 前\n\n(3.091~5.154)\n(0.94~1.568)\n(1.199~1.999)\n(0.25~0.417)\n(0.702~1.17)\n\n” 抽风 内 而 出 网 古风 同和\n\n| 属性\n\n转生 后\n\n(3.553~7.214)\n(1.081~2.195)\n(1.378~2.798)\n(0.287~0.583)\n(0.807~1.638)\n\n获取 途径\n";
+
     #[test]
     fn it_works() {
         pet_info(TEXT);
+        pet_info(CASE2);
     }
 
     #[test]
