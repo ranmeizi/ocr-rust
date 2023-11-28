@@ -108,6 +108,7 @@ pub async fn ocr_cloud_oss(
     let mut result = OCR::ocr(mat).await;
 
     if let Ok(str) = result {
+        println!("{:?}", str);
         json!(props_extractor::pet_info::pet_info(&str)).to_string()
     } else {
         "".to_owned()

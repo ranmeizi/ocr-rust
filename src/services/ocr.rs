@@ -73,7 +73,6 @@ impl OCR {
             .unwrap();
 
         let outstr: String = String::from_utf8(output.stdout).unwrap();
-        println!("{}", outstr);
         Ok(outstr)
     }
 

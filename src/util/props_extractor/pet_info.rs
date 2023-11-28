@@ -251,7 +251,7 @@ pub fn pet_info(text: &str) -> PetInfoDto {
     let iter = vec.iter().filter(|x| **x != "");
 
     // 去掉空格
-    let iter = iter.map(|x| trim_re.replace_all(x, "").to_string());
+    let iter = iter.map(|x| trim_re.replace_all(x.trim(), "").to_string());
 
     let data = PetInfoState {
         r#type: "normal".to_owned(),
@@ -285,7 +285,7 @@ pub fn pet_info(text: &str) -> PetInfoDto {
             _ => Reducers::normal(state, curr),
         };
     });
-    // println!("{:?}", json!(res).to_string());
+    println!("{:?}", json!(res).to_string());
     res.into()
 }
 
