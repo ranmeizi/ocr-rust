@@ -15,6 +15,14 @@ use tokio::process::Command;
 pub struct OCR {}
 
 impl OCR {
+    pub fn get_mat_from_bytes(bytes: Bytes) -> Mat {
+        let data: Vector<u8> = Vector::from_iter(bytes);
+
+        let mat = imgcodecs::imdecode(&data, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+
+        mat
+    }
+
     /** 二值化 */
     pub fn binarization(img_file: Bytes) -> Mat {
         // 读取图片 mat

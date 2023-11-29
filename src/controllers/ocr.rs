@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::io::Cursor;
 use std::process::{Command, Stdio};
+use cv_self::preprocessing::pet_info;
 
 pub async fn ocr_handler() -> impl IntoResponse {
     // "hello"
@@ -103,7 +104,9 @@ pub async fn ocr_cloud_oss(
 
     let bytes = bytes_res.unwrap();
 
-    let mat = OCR::binarization(bytes);
+    let mat = OCR::get_mat_from_bytes(bytes);
+
+    let mat = pet_info::run(mat).unwrap();
 
     let mut result = OCR::ocr(mat).await;
 

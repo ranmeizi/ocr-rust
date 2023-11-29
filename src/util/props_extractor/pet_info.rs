@@ -68,19 +68,12 @@ impl From<PetInfoState> for PetInfoDto {
 
 const KEYWORD_GROWTH1: &str = "转生前";
 const KEYWORD_GROWTH2: &str = "转生后";
-const KEYWORD_NAME: &str = "成长";
 
 struct Reducers {}
 
 impl Reducers {
     // 一般状态，用于判断状态转换
     fn normal(state: PetInfoState, curr: String) -> PetInfoState {
-        if curr == KEYWORD_NAME {
-            return PetInfoState {
-                r#type: "name".to_owned(),
-                ..state
-            };
-        }
 
         if curr == KEYWORD_GROWTH1 {
             return PetInfoState {
@@ -230,7 +223,7 @@ impl Reducers {
 }
 
 fn capture_num(text: &str) -> Option<(String, String)> {
-    let num_re = Regex::new(r"\(([0-9]+[.][0-9]+)~([0-9]+[.][0-9]+)\)").unwrap();
+    let num_re = Regex::new(r"\(([0-9]+[.][0-9]+)[~-]{1,2}([0-9]+[.][0-9]+)\)").unwrap();
 
     if let Some(caps) = num_re.captures(text) {
         Some((
@@ -256,8 +249,10 @@ pub fn pet_info(text: &str) -> PetInfoDto {
     // 去掉空格
     let iter = iter.map(|x| trim_re.replace_all(x.trim(), "").to_string());
 
+    println!("看看,{:?}", iter.clone().collect::<Vec<String>>());
+
     let data = PetInfoState {
-        r#type: "normal".to_owned(),
+        r#type: "name".to_owned(),
         name: None,
         growth_sum: None,
         growth_hp: None,
@@ -295,14 +290,36 @@ pub fn pet_info(text: &str) -> PetInfoDto {
 mod tests {
     use super::*;
 
-    const TEXT: &str = "飞龙 系↵↵雷 龙 系↵↵成 长↵↵邦 奇 诺↵↵总 成 长↵↵生命 成 长↵攻击 成 长↵防御 成 长↵敏捷 成 长↵↵元 素↵↵转生 前↵↵(3.091~5.154)↵(0.94~1.568)↵(1.199~1.999)↵(0.25~0.417)↵(0.702~1.17)↵↵” 抽风 内 而 出 网 古风 同和↵↵| 属性↵↵转生 后↵↵(3.553~7.214)↵(1.081~2.195)↵(1.378~2.798)↵(0.287~0.583)↵(0.807~1.638)↵↵获取 途径↵";
+    const CASE1 :&str = "帖 拉 所 伊 休
 
-    const CASE2 :&str = "飞龙 系\n\n雷 龙 系\n\n成 长\n\n邦 奇 诺\n\n总 成 长\n\n生命 成 长\n攻击 成 长\n防御 成 长\n敏捷 成 长\n\n元 素\n\n转生 前\n\n(3.091~5.154)\n(0.94~1.568)\n(1.199~1.999)\n(0.25~0.417)\n(0.702~1.17)\n\n” 抽风 内 而 出 网 古风 同和\n\n| 属性\n\n转生 后\n\n(3.553~7.214)\n(1.081~2.195)\n(1.378~2.798)\n(0.287~0.583)\n(0.807~1.638)\n\n获取 途径\n";
+    总 成 长
+    
+    生命 成 长
+    攻击 成 长
+    防御 成 长
+    敏捷 成 长
+    
+    转生 前
+    
+    (3.125-~5.211)
+    (0.961-1.603)
+    (1.17~1.95)
+    (0.328~0.548)
+    (0.666~1.11)
+    
+    转生 后
+    
+    (3.592~7.295)
+    (1.105~2.244)
+    
+    (1.345~2.73)
+    (0.377-0.767)
+    (0.765-~1.554)";
 
     #[test]
     fn it_works() {
-        pet_info(TEXT);
-        pet_info(CASE2);
+        // pet_info(TEXT);
+        pet_info(CASE1);
     }
 
     #[test]
