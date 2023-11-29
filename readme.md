@@ -20,7 +20,7 @@ axum 作为服务端
 
 - [x] 小程序客户端上传文件至oss，使用fileid请求rust的ocr服务
 - [x] rust 服务使用 fileid 获取图片文件
-- [ ] 裁剪出需要识别文字的区域 TODO
+- [x] 裁剪出需要识别文字的区域
 - [x] 图片阈值处理
 - [x] 子进程调用ocr，拿到stdout数据
-- [ ] 识别出的 text 的结果处理 TODO
+- [x] 识别出的 text 的结果处理
