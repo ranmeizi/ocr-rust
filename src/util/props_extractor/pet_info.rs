@@ -223,7 +223,7 @@ impl Reducers {
 }
 
 fn capture_num(text: &str) -> Option<(String, String)> {
-    let num_re = Regex::new(r"\(([0-9]+[.][0-9]+)[~-]{1,2}([0-9]+[.][0-9]+)\)").unwrap();
+    let num_re = Regex::new(r"[\({]([0-9]+[.][0-9]+)[~-]{1,2}([0-9]+[.][0-9]+)[\)}]").unwrap();
 
     if let Some(caps) = num_re.captures(text) {
         Some((
@@ -316,10 +316,37 @@ mod tests {
     (0.377-0.767)
     (0.765-~1.554)";
 
+    const CASE2:&str = "葛 雷 基 欧
+
+    总 成 长
+    
+    生命 成 长
+    攻击 成 长
+    防御 成 长
+    敏捷 成 长
+    
+    转生 前
+    
+    (3.194~5.325)
+    (0.942-~1.571)
+    {1.167~1.945)
+    (0.347-0.579)
+    
+    {0.738-~1.23)
+    
+    转生 后
+    
+    (3.672-~7.454)
+    (1.083-~2.199)
+    (1.342~2.723)
+    
+    (0.399-~0.81)
+    (0.848-~1.722)";
+
     #[test]
     fn it_works() {
         // pet_info(TEXT);
-        pet_info(CASE1);
+        pet_info(CASE2);
     }
 
     #[test]

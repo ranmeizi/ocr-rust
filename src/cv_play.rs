@@ -4,6 +4,7 @@ mod tests {
 
     const IMG_PATH_HRL: &str = "ocr-test/hrl.jpg";
     const IMG_PATH_TLSYD: &str = "ocr-test/jb.jpg";
+    const IMG_PATH_MN :&str ="ocr-test/mn.jpg";
 
     #[test]
     fn it_gradients() {
@@ -217,7 +218,7 @@ mod tests {
     #[test]
     fn it_mod() {
         // 从文件中加载图像
-        let src = imgcodecs::imread(IMG_PATH_TLSYD, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_PATH_MN, imgcodecs::IMREAD_GRAYSCALE).unwrap();
 
         let dst = cv_self::preprocessing::pet_info::run(src).unwrap();
 
