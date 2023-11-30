@@ -8,7 +8,6 @@ mod services;
 mod util;
 mod res;
 mod error;
-mod cv_play;
 
 #[tokio::main]
 async fn main() {

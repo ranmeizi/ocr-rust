@@ -4,6 +4,8 @@ pub fn add(left: usize, right: usize) -> usize {
 
 pub mod preprocessing;
 
+mod cv_play;
+
 #[cfg(test)]
 mod tests {
     use super::*;

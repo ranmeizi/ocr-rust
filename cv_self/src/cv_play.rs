@@ -1,10 +1,12 @@
 mod tests {
-    use crate::cv_self;
+    use crate::preprocessing;
     use opencv::{core, imgcodecs, imgproc, prelude::*};
 
+    const RES_IMG_DIR: &str = "res_img/";
     const IMG_PATH_HRL: &str = "ocr-test/hrl.jpg";
     const IMG_PATH_TLSYD: &str = "ocr-test/jb.jpg";
-    const IMG_PATH_MN :&str ="ocr-test/mn.jpg";
+    const IMG_PATH_MN: &str = "ocr-test/mn.jpg";
+    const IMG_PATH_BKR: &str = "ocr-test/bkr.jpg";
 
     #[test]
     fn it_gradients() {
@@ -42,8 +44,8 @@ mod tests {
         .unwrap();
 
         // 保存结果
-        imgcodecs::imwrite("grad_x.jpg", &grad_x, &core::Vector::new()).unwrap();
-        imgcodecs::imwrite("grad_y.jpg", &grad_y, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "grad_x.jpg", &grad_x, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "grad_y.jpg", &grad_y, &core::Vector::new()).unwrap();
     }
 
     #[test]
@@ -58,7 +60,7 @@ mod tests {
         // 使用Rect获取图像的ROI
         let roi = Mat::roi(&img, rect).unwrap();
 
-        imgcodecs::imwrite("roi.jpg", &roi, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "roi.jpg", &roi, &core::Vector::new()).unwrap();
     }
 
     #[test]
@@ -92,7 +94,12 @@ mod tests {
         )
         .unwrap();
 
-        imgcodecs::imwrite("morphologt_ex.jpg", &dst, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(
+            RES_IMG_DIR + "morphologt_ex.jpg",
+            &dst,
+            &core::Vector::new(),
+        )
+        .unwrap();
     }
 
     #[test]
@@ -105,7 +112,7 @@ mod tests {
         // 进行 Canny 边缘检测
         imgproc::canny(&img, &mut edges, 15.0, 20.0, 3, false).unwrap();
 
-        imgcodecs::imwrite("canny.jpg", &edges, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "canny.jpg", &edges, &core::Vector::new()).unwrap();
     }
 
     fn get_top_left(mid: (i32, i32), width: i32, height: i32) -> (i32, i32) {
@@ -212,16 +219,16 @@ mod tests {
             .copy_to(&mut core::Mat::roi(&black, panel_rect).unwrap())
             .unwrap();
 
-        imgcodecs::imwrite("res.jpg", &black, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "res.jpg", &black, &core::Vector::new()).unwrap();
     }
 
     #[test]
     fn it_mod() {
         // 从文件中加载图像
-        let src = imgcodecs::imread(IMG_PATH_MN, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_PATH_BKR, imgcodecs::IMREAD_GRAYSCALE).unwrap();
 
-        let dst = cv_self::preprocessing::pet_info::run(src).unwrap();
+        let dst = preprocessing::pet_info::run(src).unwrap();
 
-        imgcodecs::imwrite("threshold.jpg", &dst, &core::Vector::new()).unwrap();
+        imgcodecs::imwrite(RES_IMG_DIR + "threshold.jpg", &dst, &core::Vector::new()).unwrap();
     }
 }
