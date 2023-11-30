@@ -1,11 +1,11 @@
-use anyhow;
+use anyhow::{self, Ok};
 use opencv::{
     core::{self, Mat},
     imgproc,
     prelude::*,
 };
 
-pub fn run(src: Mat) -> anyhow::Result<Mat> {
+pub fn threshold(src: Mat) -> anyhow::Result<Mat> {
     // 应用阈值
     let threshold_value = 111.0;
     let max_binary_value = 255.0;
@@ -21,18 +21,25 @@ pub fn run(src: Mat) -> anyhow::Result<Mat> {
     )
     .unwrap();
 
+    return Ok(dst);
+}
+
+pub fn run(src: Mat) -> anyhow::Result<Mat> {
+    // 应用阈值
+    let dst = threshold(src)?;
+
     // 滤波
     let mut kernel = Mat::default();
-    
-    imgproc::laplacian(&dst, &mut kernel, -1, 3, -2.0, 0.0, core::BORDER_DEFAULT).unwrap();
+
+    imgproc::laplacian(&dst, &mut kernel, -1, 3, -2.0, 0.0, core::BORDER_DEFAULT)?;
 
     let mut aaa = Mat::default();
 
     // 将原图像和滤波器的结果相加，得到锐化的图像
-    core::add(&dst, &kernel, &mut aaa, &core::no_array(), -1).unwrap();
+    core::add(&dst, &kernel, &mut aaa, &core::no_array(), -1)?;
 
     // 截图
-    let size = aaa.size()?;
+    let size = dst.size()?;
     let core::Size { width, height } = size;
 
     // 名称区域的 rect
@@ -49,21 +56,16 @@ pub fn run(src: Mat) -> anyhow::Result<Mat> {
 
     // 裁剪
     // 使用Rect获取图像的ROI
-    let roi_name = Mat::roi(&aaa, name_rect)?;
+    let roi_name = Mat::roi(&dst, name_rect)?;
 
-    let roi_panel = Mat::roi(&aaa, panel_rect)?;
+    let roi_panel = Mat::roi(&dst, panel_rect)?;
 
     // 黑色图像
-    let black = core::Mat::zeros(aaa.rows(), aaa.cols(), core::CV_8U)
-        .unwrap()
-        .to_mat()
-        .unwrap();
+    let black = core::Mat::zeros(dst.rows(), dst.cols(), core::CV_8U)?.to_mat()?;
 
     // 从原图像中拷贝感兴趣的区域到全黑图像中
     roi_name.copy_to(&mut core::Mat::roi(&black, name_rect)?)?;
     roi_panel.copy_to(&mut core::Mat::roi(&black, panel_rect)?)?;
-
-
 
     Ok(black)
 }

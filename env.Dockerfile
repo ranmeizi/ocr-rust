@@ -3,6 +3,7 @@ FROM rust
 COPY ocr-test/* /tmp/
 
 COPY ocr-test/chi_sim.traineddata /usr/local/share/tessdata/ 
+COPY ocr-test/chi_sim_vert.traineddata /usr/local/share/tessdata/ 
 
 # 安装 ocr 环境
 RUN apt-get update ; apt-get install -y tesseract-ocr
