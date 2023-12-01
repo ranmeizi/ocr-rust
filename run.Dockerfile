@@ -1,5 +1,8 @@
 FROM boboan/ocr-rust-env
 
+# 安装 vim
+RUN apt-get install -y vim
+
 # 复制代码
 COPY . /app/
 
