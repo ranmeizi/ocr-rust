@@ -84,6 +84,31 @@ impl OCR {
         Ok(outstr)
     }
 
+    /** 拿着二值的图片调用ocr */
+    pub async fn ocr_pos(dst: Mat) -> anyhow::Result<String> {
+        let filename = random_str(20) + ".jpg";
+
+        // 保存阈值化后的图片
+        imwrite(&filename, &dst, &Vector::new()).unwrap();
+
+        let output = Command::new("tesseract")
+            .arg("-l")
+            .arg("chi_sim")
+            .arg("-c")
+            .arg("tessedit_create_boxfile=1")
+            .arg(format!("/app/{filename}"))
+            // .arg(format!("/Users/boboan/code/work/self/ocr-rust/{filename}"))
+            .arg("stdout")
+            .output()
+            .await
+            .unwrap();
+
+        println!("???ocr pos {:?}", output);
+
+        let outstr: String = String::from_utf8(output.stdout).unwrap();
+        Ok(outstr)
+    }
+
     pub async fn get_img_from_cloud(fileid: String) -> anyhow::Result<String> {
         println!("get_img_from_cloud, {}", fileid);
         let client = Client::new();
