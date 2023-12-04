@@ -22,50 +22,12 @@ pub fn threshold(src: Mat) -> anyhow::Result<Mat> {
     )
     .unwrap();
 
-    // imgproc::adaptive_threshold(
-    //     &src,
-    //     &mut dst,
-    //     255.0,
-    //     imgproc::ADAPTIVE_THRESH_GAUSSIAN_C,
-    //     imgproc::THRESH_BINARY_INV,
-    //     5,
-    //     23.0,
-    // )?;
-
     return Ok(dst);
-
-    // let mut denoised = Mat::default();
-    // photo::fast_nl_means_denoising(&dst, &mut denoised, 15.0, 7, 21)?;
-
-
-    // return Ok(denoised);
-
-    // // 滤波
-    // let mut kernel = Mat::default();
-
-    // imgproc::laplacian(&dst, &mut kernel, -1, 5, -2.0, 0.0, core::BORDER_DEFAULT)?;
-
-    // let mut aaa = Mat::default();
-
-    //  // 将原图像和滤波器的结果相加，得到锐化的图像
-    //  core::add(&dst, &kernel, &mut aaa, &core::no_array(), -1)?;
-
-    // return Ok(denoised);
 }
 
 pub fn run(src: Mat) -> anyhow::Result<Mat> {
     // 应用阈值
     let dst = threshold(src)?;
-
-    // 滤波
-    let mut kernel = Mat::default();
-
-    imgproc::laplacian(&dst, &mut kernel, -1, 3, -2.0, 0.0, core::BORDER_DEFAULT)?;
-
-    let mut aaa = Mat::default();
-
-    // 将原图像和滤波器的结果相加，得到锐化的图像
-    core::add(&dst, &kernel, &mut aaa, &core::no_array(), -1)?;
 
     // 截图
     let size = dst.size()?;

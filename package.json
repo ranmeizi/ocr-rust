@@ -9,6 +9,7 @@
     "build:app": "sh build/build.sh",
     "build:env": "docker build -t boboan/ocr-rust-env -f env.Dockerfile .",
     "run:container": "docker build -t ocr-rust-run -f run.Dockerfile . && docker run -p 3000:3000 -v $PWD/ocr-test/:/app/ocr-test/ --name ocr-rust-run ocr-rust-run",
-    "ocr": "docker run -v $PWD/res_img/threshold.jpg:/tmp/threshold.jpg -v $PWD/ocr-test/chi_sim.traineddata:/usr/local/share/tessdata/chi_sim.traineddata -v $PWD/ocr-test/chi_sim_vert.traineddata:/usr/local/share/tessdata/chi_sim_vert.traineddata jitesoft/tesseract-ocr -l chi_sim -c tessedit_create_boxfile=1 /tmp/threshold.jpg stdout"
+    "ocr": "docker run -v $PWD/res_img/threshold.jpg:/tmp/threshold.jpg -v $PWD/ocr-test/chi_sim.traineddata:/usr/local/share/tessdata/chi_sim.traineddata -v $PWD/ocr-test/chi_sim_vert.traineddata:/usr/local/share/tessdata/chi_sim_vert.traineddata jitesoft/tesseract-ocr /tmp/threshold.jpg stdout",
+    "ocr:pos": "docker run -v $PWD/res_img/threshold.jpg:/tmp/threshold.jpg -v $PWD/ocr-test/chi_sim.traineddata:/usr/local/share/tessdata/chi_sim.traineddata -v $PWD/ocr-test/chi_sim_vert.traineddata:/usr/local/share/tessdata/chi_sim_vert.traineddata jitesoft/tesseract-ocr -l chi_sim -c tessedit_create_boxfile=1 /tmp/threshold.jpg stdout"
   }
 }

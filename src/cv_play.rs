@@ -4,7 +4,7 @@ use crate::util::props_extractor::boxfile::TextPos;
 mod tests {
     use super::*;
     use crate::util::props_extractor::boxfile;
-    use crate::{services::ocr::OCR, util::props_extractor::boxfile::TextPos};
+    use crate::util::props_extractor::boxfile::TextPos;
     use anyhow;
     use cv_self::preprocessing;
     use opencv::{core, imgcodecs, imgproc, prelude::*};
@@ -17,6 +17,8 @@ mod tests {
     const IMG_PATH_TLSYD: &str = "ocr-test/jb.jpg";
     const IMG_PATH_MN: &str = "ocr-test/mn.jpg";
     const IMG_PATH_BKR: &str = "ocr-test/bkr.jpg";
+
+    const IMG_MIN_HRL: &str = "ocr-test/红人龙.jpg";
 
     #[test]
     fn it_gradients() {
@@ -245,9 +247,36 @@ mod tests {
     #[test]
     fn it_mod1() {
         // 从文件中加载图像
-        let src = imgcodecs::imread(IMG_PATH_BKR, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_MIN_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
 
         let dst = preprocessing::pet_info::threshold(src).unwrap();
+
+        imgcodecs::imwrite(
+            &format!("{}threshold.jpg", RES_IMG_DIR),
+            &dst,
+            &core::Vector::new(),
+        )
+        .unwrap();
+    }
+    #[test]
+    fn it_mod2() {
+        // 从文件中加载图像
+        let src = imgcodecs::imread(IMG_MIN_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+
+        // 应用阈值
+        let threshold_value = 127.0;
+        let max_binary_value = 255.0;
+
+        let mut dst = Mat::default();
+
+        imgproc::threshold(
+            &src,
+            &mut dst,
+            threshold_value,
+            max_binary_value,
+            imgproc::THRESH_BINARY,
+        )
+        .unwrap();
 
         imgcodecs::imwrite(
             &format!("{}threshold.jpg", RES_IMG_DIR),
@@ -387,125 +416,6 @@ mod tests {
         let _res = cv_self::preprocessing::pet_info::threshold(img).unwrap();
 
         imgcodecs::imwrite("res.jpg", &_res, &core::Vector::new()).unwrap();
-    }
-
-    #[test]
-    fn container_draw_text() {
-        println!("hello");
-        let mut rt = Runtime::new().unwrap();
-        rt.block_on(async {
-            // 在这里写你的 async 代码
-            // 从文件中载入图像
-            let mut img = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-
-            // ocr
-            let _res = cv_self::preprocessing::pet_info::threshold(img).unwrap();
-
-            let res = OCR::ocr_pos(_res).await.unwrap();
-
-            let res = boxfile::run(res.as_str());
-            let mut img = imgcodecs::imread(IMG_PATH_HRL, 1).unwrap();
-
-            let size = img.size().unwrap();
-
-            let core::Size { width, height } = size;
-
-            // 画图
-            for pos in res.iter() {
-                let TextPos {
-                    text,
-                    left,
-                    right,
-                    top,
-                    bottom,
-                } = pos;
-
-                let mut rect =
-                    core::Rect::new(*left, height - *top, *right - *left, *top - *bottom);
-
-                imgproc::rectangle(
-                    &mut img,
-                    rect,
-                    core::Scalar::new(0.0, 0.0, 255.0, 0.0),
-                    1,
-                    imgproc::LINE_AA,
-                    0,
-                )
-                .unwrap();
-            }
-            imgcodecs::imwrite("nb.jpg", &img, &core::Vector::new()).unwrap();
-        });
-    }
-
-    #[tokio::test]
-    async fn cdt1() {
-        async fn run(input: &str, output: &str) {
-            // 在这里写你的 async 代码
-            // 从文件中载入图像
-            let mut img = imgcodecs::imread(input, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-
-            // ocr
-            let _res = cv_self::preprocessing::pet_info::threshold(img).unwrap();
-
-            let res = OCR::ocr_pos(_res).await.unwrap();
-
-            let res = boxfile::run(res.as_str());
-
-            // 找"转" 后第一个 “总”，和 “元素”
-            let init: SearchingFold = SearchingFold {
-                string: String::new(),
-                last_char: None,
-                target_zhuan: None,
-                target_yuan: None,
-            };
-
-            let SearchingFold {
-                target_yuan,
-                target_zhuan,
-                ..
-            } = res
-                .iter()
-                .fold(init, |state, curr| match curr.text.as_str() {
-                    "转" => handlers::zhuan(state, curr.clone()),
-                    "素" => handlers::su(state, curr.clone()),
-                    _ => handlers::default_run(state, curr),
-                });
-
-            let mut img = imgcodecs::imread(input, 1).unwrap();
-
-            let size = img.size().unwrap();
-
-            let core::Size { width, height } = size;
-
-            let zhuan = target_zhuan.unwrap();
-            let yuan = target_yuan.unwrap();
-            // 画图
-            let top = zhuan.bottom;
-            let left = yuan.left;
-            let bottom = yuan.top;
-
-            let h = top - bottom;
-
-            let w = (2.1 * h as f64).round() as i32;
-
-            println!("xywh:{:?}", (left, height - top, w, h));
-
-            let mut rect = core::Rect::new(left, height - top, w, h);
-
-            let roi = Mat::roi(&img, rect).unwrap();
-
-            imgcodecs::imwrite(
-                format!("ocr-test/{}", output).as_str(),
-                &roi,
-                &core::Vector::new(),
-            )
-            .unwrap();
-        }
-
-        run(IMG_PATH_HRL, "红人龙.jpg").await;
-        run(IMG_PATH_BKR, "柏克尔.jpg").await;
-        run(IMG_PATH_MN, "马年.jpg").await;
-        run(IMG_PATH_TLSYD, "机暴.jpg").await;
     }
 
     #[test]
