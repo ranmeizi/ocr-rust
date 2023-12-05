@@ -1,10 +1,10 @@
 use crate::{
+    error::OcrErr,
     services::cv::PetInfoService,
     util::{
         props_extractor::pet_info::{self, PetInfoDto},
         random_str::random_str,
     },
-    error::OcrErr
 };
 use anyhow::{self};
 use axum::body::Bytes;
@@ -78,17 +78,16 @@ impl TesseractService {
      */
     pub async fn ocr_pet_growth(src: Mat) -> anyhow::Result<pet_info::PetInfoDto> {
         // 获取 成长数据 区域
-        let area = PetInfoService::get_pet_growth_area(src.clone()).await?;
+        let area = PetInfoService::get_pet_growth_area(src).await?;
 
         // 英文识别
-        let txt = Eng::ocr(area.clone()).await?;
+        let txt = Eng::ocr(area).await?;
 
         // 提取关键字
         let growth_data = pet_info::get_pet_info(&txt);
 
         Ok(growth_data)
     }
-
 }
 
 #[derive(Debug, Serialize)]
@@ -126,7 +125,7 @@ where
     };
 
     // 删除图片
-    fs::remove_file(filename).await?;
+    // fs::remove_file(filename).await?;
 
     res
 }
@@ -140,7 +139,7 @@ pub struct ChiSim {}
 
 impl ChiSim {
     pub async fn ocr(src: Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src.clone(), |filename| {
+        let res = run_cmd(src, |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg("-l")
                 .arg("chi_sim")
@@ -156,7 +155,7 @@ impl ChiSim {
 
     // 识别中文位置
     pub async fn ocr_pos(src: Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src.clone(), |filename| {
+        let res = run_cmd(src, |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg("-l")
                 .arg("chi_sim")
@@ -183,7 +182,7 @@ pub struct Eng {}
 impl Eng {
     // 默认识别英文 (在识别数字时，选择英文识别)
     pub async fn ocr(src: Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src.clone(), |filename| {
+        let res = run_cmd(src, |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg(format!("/app/{filename}")).arg("stdout");
 
@@ -213,14 +212,56 @@ struct FileList {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use opencv::imgcodecs;
+    use opencv::{core, imgcodecs};
 
     const IMG_PATH_HRL: &str = "ocr-test/hrl.jpg";
 
     #[tokio::test]
     async fn test_ocr() {
         let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-        let res = ChiSim::ocr(src.clone()).await;
+        let res = ChiSim::ocr(src).await;
         println!("res: {:?}", res);
+    }
+
+    #[tokio::test]
+    async fn test_service() {
+        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+
+        let res = TesseractService::ocr_pet_growth(src).await;
+
+        println!("res: {:?}", res);
+    }
+
+    #[tokio::test]
+    async fn step1() {
+        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+
+        let res = PetInfoService::get_pet_growth_area(src).await;
+
+        match res {
+            Ok(roi) => {
+                imgcodecs::imwrite(
+                    format!("ocr-test/{}", "bb.jpg").as_str(),
+                    &roi,
+                    &core::Vector::new(),
+                )
+                .unwrap();
+            }
+            Err(e) => {
+                println!("失败啦")
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn step2() {
+        let src = imgcodecs::imread("ocr-test/bb.jpg", imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let txt = Eng::ocr(src).await.unwrap();
+        println!("res: {:?}", txt);
+
+        // 提取关键字
+        let growth_data = pet_info::get_pet_info(&txt);
+
+        println!("res: {:?}", growth_data);
     }
 }

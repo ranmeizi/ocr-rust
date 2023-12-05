@@ -33,7 +33,7 @@ impl PetInfoService {
     pub async fn get_pet_growth_area(src: Mat) -> anyhow::Result<Mat> {
         let res = pet_threshold(src.clone())?;
 
-        let ocr_txt = tesseract::ChiSim::ocr_pos(res.clone()).await?;
+        let ocr_txt = tesseract::ChiSim::ocr_pos(res).await?;
 
         let res = boxfile::run(ocr_txt.as_str());
 

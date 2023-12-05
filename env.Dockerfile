@@ -1,7 +1,7 @@
 FROM rust
 
 COPY ocr-test/* /tmp/
-
+COPY ocr-test/eng.traineddata /usr/local/share/tessdata/ 
 COPY ocr-test/chi_sim.traineddata /usr/local/share/tessdata/ 
 COPY ocr-test/chi_sim_vert.traineddata /usr/local/share/tessdata/ 
 

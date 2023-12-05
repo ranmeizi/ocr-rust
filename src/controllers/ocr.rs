@@ -32,7 +32,7 @@ pub async fn ocr_pet_cloud(Json(param): Json<CloudFileParams>) -> impl IntoRespo
     let src = tesseract::TesseractService::get_mat_from_oss(param.fileid).await.unwrap();
 
     // 图像识别
-    let res = tesseract::TesseractService::ocr_pet_growth(src.clone()).await;
+    let res = tesseract::TesseractService::ocr_pet_growth(src).await;
 
     match res {
         Ok(data) => Res::success(data),
