@@ -1,95 +1,99 @@
-use crate::error::CustErr;
-use anyhow::Error;
+use super::error::{CustErr};
 use axum::{
+    body::{self},
     extract::rejection::{JsonRejection, QueryRejection},
-    response::IntoResponse,
+    http::{header, HeaderValue, StatusCode},
+    response::{IntoResponse, Response},
     Json,
 };
-use serde::Serialize;
-use serde_json::json;
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+use std::{fmt::Debug, println};
+// use std::error::Error;
+use anyhow::Error;
 
 /**
- * {
- *     code:200,
- *     data:{...}  T,
- *     message:"message"
- * }
+ * 统一响应结构
  */
 #[derive(Debug, Serialize)]
-pub struct Res<T> {
-    code: i32,
-    data: Option<T>,
-    message: String,
+pub struct Res<T: Serialize = ()> {
+    pub code: Option<u16>,
+    pub data: Option<T>,
+    pub msg: Option<String>,
 }
 
-impl<T> Res<T> {
+impl<T: Serialize> Res<T> {
     /**
-     * Res{
-     *     code:200,
-     *     data:data,
-     *     message:"success"
-     * }
+     * 普遍成功body
      */
     pub fn success(data: T) -> Self {
         Self {
-            code: 200,
+            code: Some(StatusCode::OK.as_u16()),
             data: Some(data),
-            message: String::from("success"),
+            msg: Some(String::from("success")),
         }
     }
 
     /**
-     * Res{
-     *     code:400/xxx,
-     *     data:None,
-     *     message:"error message"
-     * }
+     * 普遍成功body 带有msg
+     */
+    pub fn success_msg(data: T, msg: &str) -> Self {
+        Self {
+            code: Some(StatusCode::OK.as_u16()),
+            data: Some(data),
+            msg: Some(String::from(msg)),
+        }
+    }
+
+    /**
+     * 自定义错误body
      */
     pub fn error(e: Error) -> Self {
+        // 判断code值 默认为500，因为预期之外的错误统一归为服务端错误
         let code = if e.downcast_ref::<CustErr>().is_some() {
-            // 预期的错误返回 code 码
             match e.downcast_ref::<CustErr>() {
-                Some(CustErr::AppRuleError(_)) => 400,
+                // Some(CustErr::ReqParamError(_)) => 400,
+                // Some(CustErr::ReqDeleteFail(_)) => 400,
                 _ => 400,
             }
         } else {
-            // 非预期的错误返回 500
             500
         };
 
         Self {
-            code: code,
+            code: Some(code),
             data: None,
-            message: e.to_string(),
+            msg: Some(e.to_string()),
         }
+    }
+}
+
+/**
+ * 解构 JsonRejection 时的响应结构
+ */
+impl From<JsonRejection> for Res<()> {
+    fn from(value: JsonRejection) -> Self {
+        Self::error(CustErr::ReqParamError(value.body_text()).into())
+    }
+}
+
+/**
+ * 解构 QueryRejection 时的响应结构
+ */
+impl From<QueryRejection> for Res<()> {
+    fn from(value: QueryRejection) -> Self {
+        Self::error(CustErr::ReqParamError(value.body_text()).into())
     }
 }
 
 impl<T: Serialize> IntoResponse for Res<T> {
     fn into_response(self) -> axum::response::Response {
-        let val = json!(self);
+        let payload = json!(self);
 
-        Json(val).into_response()
-    }
-}
-
-impl From<JsonRejection> for Res<()> {
-    fn from(value: JsonRejection) -> Self {
-        Self {
-            code: value.status().as_u16().into(),
-            data: None,
-            message: value.body_text(),
+        if self.code.unwrap() == 401 {
+            (StatusCode::UNAUTHORIZED, Json(payload)).into_response()
+        } else {
+            (StatusCode::OK, Json(payload)).into_response()
         }
     }
 }
-
-impl From<QueryRejection> for Res<()> {
-    fn from(value: QueryRejection) -> Self {
-        Self {
-            code: value.status().as_u16().into(),
-            data: None,
-            message: value.body_text(),
-        }
-    }
-}
-

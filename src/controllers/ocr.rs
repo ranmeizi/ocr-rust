@@ -1,22 +1,14 @@
+use crate::error::OcrErr;
 use crate::res::Res;
-use crate::util::props_extractor;
-use axum::{
-    body::Bytes,
-    extract::{Json, Multipart, Query},
-    response::IntoResponse,
-};
+use crate::services::{cv, tesseract};
+use axum::{body::Bytes, extract::Json, response::IntoResponse};
 use axum_extra::extract::WithRejection;
-use base64_url;
-use cv_self::preprocessing::pet_info;
 use opencv::{
-    core::{in_range, Mat, Scalar, Vector},
     imgcodecs::{self, imwrite},
-    imgproc,
     prelude::*,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::io::Cursor;
 use std::process::{Command, Stdio};
 
 pub async fn ocr_handler() -> impl IntoResponse {
@@ -34,6 +26,20 @@ pub async fn ocr_handler() -> impl IntoResponse {
     outstr
 }
 
+// #[debug_handler]
+pub async fn ocr_pet_cloud(Json(param): Json<CloudFileParams>) -> impl IntoResponse {
+    // 加载图像
+    let src = tesseract::TesseractService::get_mat_from_oss(param.fileid).await.unwrap();
+
+    // 图像识别
+    let res = tesseract::TesseractService::ocr_pet_growth(&src).await;
+
+
+    match res {
+        Ok(data) => Res::success(data),
+        Err(e) => Res::error(e),
+    }
+}
 
 #[derive(Debug)]
 struct OcrParams {

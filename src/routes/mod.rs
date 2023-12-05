@@ -11,4 +11,5 @@ pub fn compose() -> Router {
 pub fn post_api() -> Router {
     Router::new()
         .route("/sqsd", get(ocr::ocr_handler))
+        .route("/sqsd/oss",post(ocr::ocr_pet_cloud))
 }

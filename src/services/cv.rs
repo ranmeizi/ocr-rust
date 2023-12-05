@@ -3,24 +3,34 @@ use crate::{
     util::props_extractor::{boxfile, pet_info},
 };
 use anyhow;
-use opencv::{imgproc, prelude::*};
+use opencv::{core::Mat, imgproc, prelude::*};
 
 /**
  * 宠物用的二值化
  */
 pub fn pet_threshold(src: &Mat) -> anyhow::Result<Mat> {
+    // 应用阈值
+    let threshold_value = 164.0;
+    let max_binary_value = 255.0;
+
     let mut dst = Mat::default();
 
-    imgproc::threshold(src, &mut dst, 164.0, 255.0, imgproc::THRESH_BINARY)?;
+    imgproc::threshold(
+        &src,
+        &mut dst,
+        threshold_value,
+        max_binary_value,
+        imgproc::THRESH_BINARY,
+    )?;
 
     Ok(dst)
 }
 
-pub struct PetInfo {}
+pub struct PetInfoService {}
 
-impl PetInfo {
+impl PetInfoService {
     // 截取宠物成长区域
-    async fn get_pet_growth_area(src: &Mat) -> anyhow::Result<Mat> {
+    pub async fn get_pet_growth_area(src: &Mat) -> anyhow::Result<Mat> {
         let res = pet_threshold(src)?;
 
         let ocr_txt = tesseract::ChiSim::ocr_pos(&res).await?;

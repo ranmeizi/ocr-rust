@@ -6,7 +6,6 @@ mod tests {
     use crate::util::props_extractor::boxfile;
     use crate::util::props_extractor::boxfile::TextPos;
     use anyhow;
-    use cv_self::preprocessing;
     use opencv::{core, imgcodecs, imgproc, prelude::*};
     use tokio::runtime::Runtime;
 
@@ -230,35 +229,6 @@ mod tests {
     }
 
     #[test]
-    fn it_mod() {
-        // 从文件中加载图像
-        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-
-        let dst = preprocessing::pet_info::run(src).unwrap();
-
-        imgcodecs::imwrite(
-            &format!("{}threshold.jpg", RES_IMG_DIR),
-            &dst,
-            &core::Vector::new(),
-        )
-        .unwrap();
-    }
-
-    #[test]
-    fn it_mod1() {
-        // 从文件中加载图像
-        let src = imgcodecs::imread(IMG_MIN_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-
-        let dst = preprocessing::pet_info::threshold(src).unwrap();
-
-        imgcodecs::imwrite(
-            &format!("{}threshold.jpg", RES_IMG_DIR),
-            &dst,
-            &core::Vector::new(),
-        )
-        .unwrap();
-    }
-    #[test]
     fn it_mod2() {
         // 从文件中加载图像
         let src = imgcodecs::imread(IMG_MIN_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
@@ -406,16 +376,6 @@ mod tests {
             &core::Vector::new(),
         )
         .unwrap();
-    }
-
-    #[test]
-    fn range_hrl() {
-        // 从文件中载入图像
-        let mut img = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-
-        let _res = cv_self::preprocessing::pet_info::threshold(img).unwrap();
-
-        imgcodecs::imwrite("res.jpg", &_res, &core::Vector::new()).unwrap();
     }
 
     #[test]

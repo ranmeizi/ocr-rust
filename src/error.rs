@@ -11,3 +11,9 @@ pub enum CustErr {
     #[error("App rule : {0}")]
     AppRuleError(String)
 }
+
+#[derive(Error, Debug)]
+pub enum OcrErr {
+    #[error("识别失败")]
+    OcrFail,
+}
