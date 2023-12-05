@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 anyhow = {workspace = true}
-axum = {workspace = true}
+axum.workspace = true
 axum-extra = {workspace = true}
 base64-url = {workspace = true}
 opencv = {workspace = true}
@@ -24,7 +24,7 @@ menbers = ['.']
 
 [workspace.dependencies]
 anyhow = "1.0"
-axum = {version = "0.7.2", features = ['multipart']}
+axum = {version = "0.7.2", features = ['multipart','macros']}
 axum-extra = "0"
 base64-url = "2.0.1"
 opencv = "0.86.1"

@@ -76,12 +76,12 @@ impl TesseractService {
     /**
      * 使用灰度的原图
      */
-    pub async fn ocr_pet_growth(src: &Mat) -> anyhow::Result<pet_info::PetInfoDto> {
+    pub async fn ocr_pet_growth(src: Mat) -> anyhow::Result<pet_info::PetInfoDto> {
         // 获取 成长数据 区域
-        let area = PetInfoService::get_pet_growth_area(src).await?;
+        let area = PetInfoService::get_pet_growth_area(src.clone()).await?;
 
         // 英文识别
-        let txt = Eng::ocr(&area).await?;
+        let txt = Eng::ocr(area.clone()).await?;
 
         // 提取关键字
         let growth_data = pet_info::get_pet_info(&txt);
@@ -89,22 +89,6 @@ impl TesseractService {
         Ok(growth_data)
     }
 
-    /**
-     * 使用灰度的原图
-     */
-    pub async fn ocr_pet_growth1(src: &Mat) -> anyhow::Result<PetInfoDto> {
-        // 获取 成长数据 区域
-        let area = PetInfoService::get_pet_growth_area(src).await?;
-
-        // 英文识别
-        // let txt = Eng::ocr(&area).await?;
-        let txt = "1".to_string();
-
-        // 提取关键字
-        let growth_data = pet_info::get_pet_info(&txt);
-
-        Ok(growth_data)
-    }
 }
 
 #[derive(Debug, Serialize)]
@@ -119,7 +103,7 @@ struct OSS {}
 impl OSS {}
 
 // 使用临时文件 调用 tesseract 识别
-async fn run_cmd<F>(src: &Mat, cmd: F) -> anyhow::Result<String>
+async fn run_cmd<F>(src: Mat, cmd: F) -> anyhow::Result<String>
 where
     F: FnOnce(&str) -> Command,
 {
@@ -155,8 +139,8 @@ where
 pub struct ChiSim {}
 
 impl ChiSim {
-    pub async fn ocr(src: &Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src, |filename| {
+    pub async fn ocr(src: Mat) -> anyhow::Result<String> {
+        let res = run_cmd(src.clone(), |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg("-l")
                 .arg("chi_sim")
@@ -171,8 +155,8 @@ impl ChiSim {
     }
 
     // 识别中文位置
-    pub async fn ocr_pos(src: &Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src, |filename| {
+    pub async fn ocr_pos(src: Mat) -> anyhow::Result<String> {
+        let res = run_cmd(src.clone(), |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg("-l")
                 .arg("chi_sim")
@@ -198,8 +182,8 @@ pub struct Eng {}
 
 impl Eng {
     // 默认识别英文 (在识别数字时，选择英文识别)
-    pub async fn ocr(src: &Mat) -> anyhow::Result<String> {
-        let res = run_cmd(src, |filename| {
+    pub async fn ocr(src: Mat) -> anyhow::Result<String> {
+        let res = run_cmd(src.clone(), |filename| {
             let mut cmd = Command::new("tesseract");
             cmd.arg(format!("/app/{filename}")).arg("stdout");
 
@@ -236,7 +220,7 @@ mod tests {
     #[tokio::test]
     async fn test_ocr() {
         let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
-        let res = ChiSim::ocr(&src).await;
+        let res = ChiSim::ocr(src.clone()).await;
         println!("res: {:?}", res);
     }
 }

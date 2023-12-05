@@ -8,7 +8,7 @@ use opencv::{core::Mat, imgproc, prelude::*};
 /**
  * 宠物用的二值化
  */
-pub fn pet_threshold(src: &Mat) -> anyhow::Result<Mat> {
+pub fn pet_threshold(src: Mat) -> anyhow::Result<Mat> {
     // 应用阈值
     let threshold_value = 164.0;
     let max_binary_value = 255.0;
@@ -30,10 +30,10 @@ pub struct PetInfoService {}
 
 impl PetInfoService {
     // 截取宠物成长区域
-    pub async fn get_pet_growth_area(src: &Mat) -> anyhow::Result<Mat> {
-        let res = pet_threshold(src)?;
+    pub async fn get_pet_growth_area(src: Mat) -> anyhow::Result<Mat> {
+        let res = pet_threshold(src.clone())?;
 
-        let ocr_txt = tesseract::ChiSim::ocr_pos(&res).await?;
+        let ocr_txt = tesseract::ChiSim::ocr_pos(res.clone()).await?;
 
         let res = boxfile::run(ocr_txt.as_str());
 
@@ -44,7 +44,7 @@ impl PetInfoService {
         let growth_size = pet_info::get_text_pos_vec(res, size);
 
         // 截取 区域
-        let roi = Mat::roi(src, growth_size)?;
+        let roi = Mat::roi(&src, growth_size)?;
 
         Ok(roi)
     }

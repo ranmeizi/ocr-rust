@@ -26,14 +26,13 @@ pub async fn ocr_handler() -> impl IntoResponse {
     outstr
 }
 
-// #[debug_handler]
+#[axum::debug_handler]
 pub async fn ocr_pet_cloud(Json(param): Json<CloudFileParams>) -> impl IntoResponse {
     // 加载图像
     let src = tesseract::TesseractService::get_mat_from_oss(param.fileid).await.unwrap();
 
     // 图像识别
-    let res = tesseract::TesseractService::ocr_pet_growth(&src).await;
-
+    let res = tesseract::TesseractService::ocr_pet_growth(src.clone()).await;
 
     match res {
         Ok(data) => Res::success(data),
