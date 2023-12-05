@@ -10,7 +10,7 @@ use opencv::{core::Mat, imgproc, prelude::*};
  */
 pub fn pet_threshold(src: Mat) -> anyhow::Result<Mat> {
     // 应用阈值
-    let threshold_value = 164.0;
+    let threshold_value = 155.0;
     let max_binary_value = 255.0;
 
     let mut dst = Mat::default();
@@ -34,6 +34,8 @@ impl PetInfoService {
         let res = pet_threshold(src.clone())?;
 
         let ocr_txt = tesseract::ChiSim::ocr_pos(res).await?;
+
+        println!("ocr_txt,{}", ocr_txt);
 
         let res = boxfile::run(ocr_txt.as_str());
 

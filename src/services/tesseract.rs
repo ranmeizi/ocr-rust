@@ -215,17 +215,18 @@ mod tests {
     use opencv::{core, imgcodecs};
 
     const IMG_PATH_HRL: &str = "ocr-test/hrl.jpg";
+    const IMG_PATH_HB: &str = "ocr-test/hb.jpg";
 
     #[tokio::test]
     async fn test_ocr() {
-        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_PATH_HB, imgcodecs::IMREAD_GRAYSCALE).unwrap();
         let res = ChiSim::ocr(src).await;
         println!("res: {:?}", res);
     }
 
     #[tokio::test]
     async fn test_service() {
-        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_PATH_HB, imgcodecs::IMREAD_GRAYSCALE).unwrap();
 
         let res = TesseractService::ocr_pet_growth(src).await;
 
@@ -234,7 +235,7 @@ mod tests {
 
     #[tokio::test]
     async fn step1() {
-        let src = imgcodecs::imread(IMG_PATH_HRL, imgcodecs::IMREAD_GRAYSCALE).unwrap();
+        let src = imgcodecs::imread(IMG_PATH_HB, imgcodecs::IMREAD_GRAYSCALE).unwrap();
 
         let res = PetInfoService::get_pet_growth_area(src).await;
 

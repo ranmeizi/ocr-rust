@@ -5,6 +5,7 @@
   "repository": "https://github.com/ranmeizi/ocr-rust.git",
   "author": "boboan <360969885@qq.com>",
   "license": "MIT",
+  "description": "一个 rust 的 ocr 开发环境",
   "scripts": {
     "build:app": "sh build/build.sh",
     "build:env": "docker build -t boboan/ocr-rust-env -f env.Dockerfile .",
